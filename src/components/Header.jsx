@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const HeaderComponent = () => {
   return (
-    <nav className="bg-red-200 border-gray-200 px-2 sm:px-4 py-2.5 rounded dark:bg-gray-900">
+    <nav className="bg-green-400 border-gray-200 px-2 sm:px-4 py-2.5 rounded dark:bg-gray-900">
       <div className="container flex flex-wrap justify-between items-center mx-auto">
         <a href="https://flowbite.com/" className="flex items-center">
           <img
@@ -46,6 +46,9 @@ const HeaderComponent = () => {
             </li>
             <li>
               <Link to="/coins">Coins</Link>
+            </li>
+            <li>
+              <Link to="/trending">Trending Coins</Link>
             </li>
           </ul>
         </div>

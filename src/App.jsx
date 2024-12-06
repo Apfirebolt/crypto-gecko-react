@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import HomePage from "./screens/Home";
 import ExchangeList from "./screens/Exchanges";
 import CoinList from "./screens/Coins";
+import TrendingList from "./screens/Trending";
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
           <Route path="/" element={<HomePage/>} exact />
           <Route path="/coins" element={<CoinList/>} />
           <Route path="/exchanges" element={<ExchangeList/>} />
+          <Route path="/trending" element={<TrendingList/>} />
         </Routes>
       <Footer />
       <ToastContainer />
