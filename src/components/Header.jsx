@@ -42,10 +42,10 @@ const HeaderComponent = () => {
               <Link to="/">Home</Link>
             </li>
             <li>
-              <Link to="/list">Currencies</Link>
+              <Link to="/exchanges">Exchanges</Link>
             </li>
             <li>
-              <Link to="/compare">Compare</Link>
+              <Link to="/coins">Coins</Link>
             </li>
           </ul>
         </div>

@@ -4,7 +4,7 @@ import Loader from '../components/Loader';
 
 
 const Exchanges = () => {
-    const [coins, setCoins] = useState([]);
+    const [exchanges, setExchanges] = useState([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -15,10 +15,10 @@ const Exchanges = () => {
                     'x-cg-pro-api-key': ''
                 };
                 setLoading(true)
-                const response = await axios.get('https://api.coingecko.com/api/v3/coins/list', { headers });
+                const response = await axios.get('https://api.coingecko.com/api/v3/exchanges', { headers });
                 if (response) {
                     setLoading(false);
-                    setCoins(response.data);
+                    setExchanges(response.data);
                 }
             } catch (error) {
                 setLoading(false);
@@ -35,11 +35,25 @@ const Exchanges = () => {
                 <Loader />
             ) : (
                 <div className="bg-white p-6 rounded-lg shadow-lg">
-                    <h1 className="text-2xl font-bold mb-4">Exchanges Page</h1>
-                    <p className="text-gray-700">This is a simple page styled with Tailwind CSS.</p>
+                    <h1 className="text-2xl font-bold text-center mb-4">Exchanges</h1>
                     <ul>
-                        {coins.map((coin) => (
-                            <li key={coin.id}>{coin.name}</li>
+                        {exchanges.map((exchange) => (
+                            <li key={exchange.id} className="mb-4">
+                            <div className="flex items-center container">
+                                <img src={exchange.image} alt={exchange.name} className="w-10 h-10 mr-4" />
+                                <div className="p-3">
+                                    <a href={exchange.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 text-xl hover:underline">
+                                        {exchange.name}
+                                    </a>
+                                    <div className="my-2">
+                                        <p className="text-gray-600">{exchange.description}</p>
+                                        <p className="text-gray-600">Country: {exchange.country}</p>
+                                        <p className="text-gray-600">Year Established: {exchange.year_established}</p>
+                                        <p className="text-gray-600">Trust Score: {exchange.trust_score}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
                         ))}
                     </ul>
                 </div>
