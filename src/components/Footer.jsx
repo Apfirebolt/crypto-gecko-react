@@ -4,8 +4,8 @@ const FooterComponent = () => {
   return (
     <Fragment>
       <footer
-        className="bg-red-700
-             text-2xl text-white text-center
+        className="bg-green-700
+             text-xl text-white text-center
              border-t-4
              fixed
              inset-x-0
