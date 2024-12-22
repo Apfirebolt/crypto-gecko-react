@@ -55,4 +55,39 @@ You don't have to ever use `eject`. The curated feature set is suitable for smal
 
 ## Project Screenshots
 
-Would be added later as there might be some changes planned in the UI.
+### Home Page
+![Home Page](screenshots/2.png)
+
+On the homepage you have option to search for coins and can see price of the coins in USD and INR through a modal.
+
+### Coin List
+![Coin Details](screenshots/4.png)
+
+### Trending Coins
+![Trending Coins](screenshots/1.png)
+
+### Exchanges List
+![Exchanges List](screenshots/3.png)
+
+## Contribute
+
+I welcome contributions to this project! If you have suggestions for improvements or have found a bug, please open an issue or submit a pull request. Here are some ways you can contribute:
+
+1. **Report Bugs**: If you find a bug, please report it by opening an issue. Be sure to include details about the bug and how to reproduce it.
+
+2. **Suggest Features**: If you have an idea for a new feature, please open an issue to discuss it. We welcome all ideas and feedback.
+
+3. **Submit Pull Requests**: If you have a fix or a new feature that you would like to contribute, please submit a pull request. Make sure to follow the project's coding standards and include tests for your changes.
+
+4. **Improve Documentation**: If you find any part of the documentation unclear or incomplete, feel free to make improvements.
+
+### How to Contribute
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-branch`).
+3. Make your changes.
+4. Commit your changes (`git commit -m 'Add some feature'`).
+5. Push to the branch (`git push origin feature-branch`).
+6. Open a pull request.
+
+Thank you for your contributions!
