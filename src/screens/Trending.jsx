@@ -39,41 +39,31 @@ const Coins = () => {
                     <ul>
                         {trending.coins && trending.coins.map((coin) => (
                             <li key={coin.item.id} className="mb-4">
-                            <div className="p-3 bg-blue-500">
-                                <p className="text-white">
-                                    Name - <span className="font-bold">{coin.item.name}</span> <br />
-                                </p>
-                                <p className="text-white">   
-                                    Symbol - <span className="font-bold">{coin.item.symbol}</span> <br />
-                                </p>
-                                <img src={coin.item.thumb} alt={coin.item.name} className="w-24 h-24 mr-4 my-3" />
-                                <p className="text-white">   
-                                    Rank - <span className="font-bold">{coin.item.market_cap_rank}</span> <br />
-                                </p>
-                                <p className="text-white">
-                                    Score - <span className="font-bold">{coin.item.score}</span> <br />
-                                </p>
-                                <p className="text-white">
-                                    BTC Price - <span className="font-bold">{coin.item.price_btc}</span> <br />
-                                </p>
-                            </div>
-                        </li>
+                                <div className="flex items-center container bg-neutral-100 p-4 rounded-lg shadow-lg">
+                                    <img src={coin.item.thumb} alt={coin.item.name} className="w-24 h-24 mr-4" />
+                                    <div className="p-3">
+                                        <p className="text-blue-500 text-xl font-bold">{coin.item.name}</p>
+                                        <p className="text-gray-600">Symbol: {coin.item.symbol}</p>
+                                        <p className="text-gray-600">Rank: {coin.item.market_cap_rank}</p>
+                                        <p className="text-gray-600">Score: {coin.item.score}</p>
+                                        <p className="text-gray-600">BTC Price: {coin.item.price_btc}</p>
+                                    </div>
+                                </div>
+                            </li>
                         ))}
                     </ul>
 
                     <h1 className="text-2xl font-bold text-center mb-4">Trending Categories</h1>
                     <ul>
-                        {trending.categories && trending.categories.map((coin) => (
-                            <li key={coin.id}>
-                            <div className="p-3 bg-blue-500">
-                                <p className="text-white">
-                                    Name - <span className="font-bold">{coin.name}</span> <br />
-                                </p>
-                                <p className="text-white">
-                                    Coins Count - <span className="font-bold">{coin.coins_count}</span> <br />
-                                </p>
-                            </div>
-                        </li>
+                        {trending.categories && trending.categories.map((category) => (
+                            <li key={category.id} className="mb-4">
+                                <div className="flex items-center container bg-neutral-100 p-4 rounded-lg shadow-lg">
+                                    <div className="p-3">
+                                        <p className="text-blue-500 text-xl font-bold">{category.name}</p>
+                                        <p className="text-gray-600">Coins Count: {category.coins_count}</p>
+                                    </div>
+                                </div>
+                            </li>
                         ))}
                     </ul>
                 </div>

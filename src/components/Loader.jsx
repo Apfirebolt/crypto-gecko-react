@@ -3,10 +3,8 @@ import { Fragment } from "react";
 const LoaderComponent = () => {
   return (
     <Fragment>
-      <div className="loader">
-        <h2 className="text-3xl text-center text-blue-500">
-            Loading ....
-        </h2>
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-neutral-700"></div>
       </div>
     </Fragment>
   );

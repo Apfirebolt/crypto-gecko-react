@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const HeaderComponent = () => {
   return (
-    <nav className="bg-green-400 border-gray-200 px-2 sm:px-4 py-2.5 rounded dark:bg-gray-900">
+    <nav className="bg-neutral-700 border-gray-200 px-2 sm:px-4 py-4 dark:bg-gray-900">
       <div className="container flex flex-wrap justify-between items-center mx-auto">
         <p className="text-xl text-white font-bold">
           Crypto Gecko

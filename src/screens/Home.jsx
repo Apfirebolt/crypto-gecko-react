@@ -7,7 +7,7 @@ const Home = () => {
   const [coinData, setCoinData] = useState([]);
   const [coinPriceMessage, setCoinPriceMessage] = useState("");
   const [showPriceModal, setShowPriceModal] = useState(false);
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState("Bitcoin");
   const [loading, setLoading] = useState(false);
 
   // Fetch coins search from the api if user stops typing for 500ms
