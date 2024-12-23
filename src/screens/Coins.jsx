@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Button } from "@/components/ui/button"
 import Loader from "../components/Loader";
 
 const Coins = () => {
@@ -88,19 +89,19 @@ const Coins = () => {
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h1 className="text-2xl font-bold text-center mb-4">Coins</h1>
           <div className="flex justify-center mb-4">
-            <button
-              className="bg-blue-500 text-white px-4 py-2 rounded-l hover:bg-blue-700"
+            <Button
+              className="bg-blue-500 text-white px-4 py-2 hover:bg-blue-700"
               onClick={goToPreviousPage}
               disabled={page === 1}
             >
               Previous
-            </button>
-            <button
-              className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-700"
+            </Button>
+            <Button
+              className="bg-blue-500 mx-2 text-white px-4 py-2 hover:bg-blue-700"
               onClick={goToNextPage}
             >
               Next
-            </button>
+            </Button>
           </div>
           <div className="mx-auto container my-2">
             <ul>

@@ -1,5 +1,6 @@
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
 ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![shadcn](https://img.shields.io/badge/shadcn-%23000000.svg?style=for-the-badge&logo=shadcn&logoColor=white)
 
 # Cryptocurrency Info App in React using TailwindCSS
 
@@ -15,6 +16,90 @@ A web application which uses the CoinGecko API to fetch real-time cryptocurrency
 
 * React - For UI development
 * Tailwind CSS - For CSS component styling
+
+# Adding Shadcn
+
+```
+
+```
+
+Create tsconfig.json file with the following contents 
+
+```
+{
+  "compilerOptions": {
+    // ...
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+    // ...
+  }
+}
+```
+
+Install Types package and update vite.config.js file
+
+```
+npm install -D @types/node
+```
+
+```
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 3000,
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+})
+```
+
+Run the CLI
+
+```
+npx shadcn@latest init
+```
+
+Configure components.json file
+
+```
+Which style would you like to use? › New York
+Which color would you like to use as base color? › Zinc
+Do you want to use CSS variables for colors? › no / yes
+```
+
+That's it, you can now start adding components to your project. For adding button, use the following command
+
+```
+npx shadcn@latest add button
+```
+
+To use it anywhere inside your application
+
+```
+import { Button } from "@/components/ui/button"
+ 
+export default function Home() {
+  return (
+    <div>
+      <Button>Click me</Button>
+    </div>
+  )
+}
+```
 
 ## Available Scripts
 
