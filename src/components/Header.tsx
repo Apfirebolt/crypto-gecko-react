@@ -1,6 +1,7 @@
+import React from "react";
 import { Link } from "react-router-dom";
 
-const HeaderComponent = () => {
+const HeaderComponent: React.FC = () => {
   return (
     <nav className="bg-neutral-700 border-gray-200 px-2 sm:px-4 py-4 dark:bg-gray-900">
       <div className="container flex flex-wrap justify-between items-center mx-auto">

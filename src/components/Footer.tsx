@@ -1,6 +1,6 @@
-import { Fragment } from "react";
+import { Fragment, FC } from "react";
 
-const FooterComponent = () => {
+const FooterComponent: FC = () => {
   return (
     <Fragment>
       <footer

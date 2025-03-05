@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import HomePage from "./screens/Home";
-import ExchangeList from "./screens/Exchanges";
-import CoinList from "./screens/Coins";
-import TrendingList from "./screens/Trending";
+import Header from "./components/Header.js";
+import Footer from "./components/Footer.js";
+import HomePage from "./screens/Home.jsx";
+import ExchangeList from "./screens/Exchanges.js";
+import CoinList from "./screens/Coins.jsx";
+import TrendingList from "./screens/Trending.jsx";
 
 const App = () => {
   return (

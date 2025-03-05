@@ -1,20 +1,41 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Loader from '../components/Loader';
+import Loader from '../components/Loader.tsx';
 
+interface Coin {
+    item: {
+        id: string;
+        name: string;
+        symbol: string;
+        market_cap_rank: number;
+        score: number;
+        price_btc: number;
+        thumb: string;
+    };
+}
 
-const Coins = () => {
-    const [trending, setTrending] = useState([]);
-    const [loading, setLoading] = useState(false);
+interface Category {
+    id: string;
+    name: string;
+    coins_count: number;
+}
+
+interface TrendingData {
+    coins: Coin[];
+    categories: Category[];
+}
+
+const Trending = () => {
+    const [trending, setTrending] = useState<TrendingData>({ coins: [], categories: [] });
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // set headers
                 const headers = {
                     'x-cg-pro-api-key': ''
                 };
-                setLoading(true)
+                setLoading(true);
                 const response = await axios.get('https://api.coingecko.com/api/v3/search/trending', { headers });
                 if (response) {
                     setLoading(false);
@@ -25,7 +46,7 @@ const Coins = () => {
                 console.error('Error fetching data:', error);
             }
         };
-    
+
         fetchData();
     }, []);
 
@@ -72,4 +93,4 @@ const Coins = () => {
     );
 };
 
-export default Coins;
+export default Trending;
