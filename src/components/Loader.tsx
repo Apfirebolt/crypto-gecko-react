@@ -1,6 +1,6 @@
-import { Fragment } from "react";
+import React, { Fragment } from "react";
 
-const LoaderComponent = () => {
+const LoaderComponent: React.FC = () => {
   return (
     <Fragment>
       <div className="flex justify-center items-center h-screen">

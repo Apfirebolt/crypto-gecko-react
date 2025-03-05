@@ -1,16 +1,26 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Button } from "@/components/ui/button"
-import Loader from "../components/Loader";
+import { Button } from "@/components/ui/button";
+import Loader from "../components/Loader.tsx";
 
-const Coins = () => {
-  const [coins, setCoins] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
+interface Coin {
+  id: string;
+  image: string;
+  name: string;
+  symbol: string;
+  current_price: number;
+  market_cap: number;
+  total_volume: number;
+  price_change_percentage_24h: number;
+}
+
+const Coins: React.FC = () => {
+  const [coins, setCoins] = useState<Coin[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
 
   const fetchData = async () => {
     try {
-      // set headers
       const headers = {
         "x-cg-pro-api-key": "",
       };
@@ -31,7 +41,6 @@ const Coins = () => {
 
   const goToNextPage = async () => {
     try {
-      // set headers
       const headers = {
         "x-cg-pro-api-key": "",
       };
@@ -55,7 +64,6 @@ const Coins = () => {
 
   const goToPreviousPage = async () => {
     try {
-      // set headers
       const headers = {
         "x-cg-pro-api-key": "",
       };
@@ -128,8 +136,7 @@ const Coins = () => {
                           Volume: ${coin.total_volume}
                         </p>
                         <p className="text-gray-600 my-1">
-                          Price Change (24h): {coin.price_change_percentage_24h}
-                          %
+                          Price Change (24h): {coin.price_change_percentage_24h}%
                         </p>
                       </div>
                     </div>

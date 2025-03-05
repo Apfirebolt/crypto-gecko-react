@@ -1,20 +1,32 @@
-import { useState, Fragment } from "react";
+import React, { useState, Fragment, ChangeEvent } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import axios from "axios";
-import Loader from "../components/Loader";
+import Loader from "../components/Loader.tsx";
+
+interface Coin {
+  id: string;
+  name: string;
+  symbol: string;
+  thumb: string;
+  market_cap_rank: number;
+}
+
+interface CoinData {
+  coins: Coin[];
+}
 
 const Home = () => {
-  const [coinData, setCoinData] = useState([]);
-  const [coinPriceMessage, setCoinPriceMessage] = useState("");
-  const [showPriceModal, setShowPriceModal] = useState(false);
-  const [searchText, setSearchText] = useState("Bitcoin");
-  const [loading, setLoading] = useState(false);
+  const [coinData, setCoinData] = useState<CoinData>({ coins: [] });
+  const [coinPriceMessage, setCoinPriceMessage] = useState<string>("");
+  const [showPriceModal, setShowPriceModal] = useState<boolean>(false);
+  const [searchText, setSearchText] = useState<string>("Bitcoin");
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Fetch coins search from the api if user stops typing for 500ms
-  const fetchCoins = async (searchText) => {
+  const fetchCoins = async (searchText: string) => {
     setLoading(true);
     try {
-      const { data } = await axios.get(
+      const { data } = await axios.get<CoinData>(
         `https://api.coingecko.com/api/v3/search?query=${searchText}`
       );
       setCoinData(data);
@@ -25,8 +37,8 @@ const Home = () => {
   };
 
   // avoid multiple api calls when user types in the input field
-  let debounceTimeout;
-  const debounceFetchCoins = (text) => {
+  let debounceTimeout: NodeJS.Timeout;
+  const debounceFetchCoins = (text: string) => {
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(() => {
       fetchCoins(text);
@@ -38,7 +50,7 @@ const Home = () => {
   };
 
   // Call the delayedFetchCoins function when user types in the input field
-  const handleSearch = (e) => {
+  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
     if (e.target.value.length > 3) {
       debounceFetchCoins(e.target.value);
@@ -46,12 +58,10 @@ const Home = () => {
   };
 
   // Function to show the price of selected coin in USD
-  // https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=inr
-
-  const showPrice = async (coinId) => {
+  const showPrice = async (coinId: string) => {
     try {
       setLoading(true);
-      const { data } = await axios.get(
+      const { data } = await axios.get<{ [key: string]: { usd: number } }>(
         `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`
       );
       setLoading(false);
@@ -64,10 +74,10 @@ const Home = () => {
     }
   };
 
-  const showPriceINR = async (coinId) => {
+  const showPriceINR = async (coinId: string) => {
     try {
       setLoading(true);
-      const { data } = await axios.get(
+      const { data } = await axios.get<{ [key: string]: { inr: number } }>(
         `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=inr`
       );
       setLoading(false);
