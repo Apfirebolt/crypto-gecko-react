@@ -51,7 +51,7 @@ const Trending = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gray-100 container mx-auto">
+        <div className="min-h-screen bg-primary-300 container mx-auto">
             {loading ? (
                 <Loader />
             ) : (
@@ -60,14 +60,14 @@ const Trending = () => {
                     <ul>
                         {trending.coins && trending.coins.map((coin) => (
                             <li key={coin.item.id} className="mb-4">
-                                <div className="flex items-center container bg-neutral-100 p-4 rounded-lg shadow-lg">
+                                <div className="flex items-center container bg-secondary-300 text-primary-300 p-4 rounded-lg shadow-lg">
                                     <img src={coin.item.thumb} alt={coin.item.name} className="w-24 h-24 mr-4" />
                                     <div className="p-3">
-                                        <p className="text-blue-500 text-xl font-bold">{coin.item.name}</p>
-                                        <p className="text-gray-600">Symbol: {coin.item.symbol}</p>
-                                        <p className="text-gray-600">Rank: {coin.item.market_cap_rank}</p>
-                                        <p className="text-gray-600">Score: {coin.item.score}</p>
-                                        <p className="text-gray-600">BTC Price: {coin.item.price_btc}</p>
+                                        <p className="my-2 text-xl font-bold">{coin.item.name}</p>
+                                        <p>Symbol: {coin.item.symbol}</p>
+                                        <p>Rank: {coin.item.market_cap_rank}</p>
+                                        <p>Score: {coin.item.score}</p>
+                                        <p>BTC Price: {coin.item.price_btc}</p>
                                     </div>
                                 </div>
                             </li>
@@ -78,10 +78,10 @@ const Trending = () => {
                     <ul>
                         {trending.categories && trending.categories.map((category) => (
                             <li key={category.id} className="mb-4">
-                                <div className="flex items-center container bg-neutral-100 p-4 rounded-lg shadow-lg">
+                                <div className="flex items-center container bg-secondary-300 text-primary-300 p-4 rounded-lg shadow-lg">
                                     <div className="p-3">
-                                        <p className="text-blue-500 text-xl font-bold">{category.name}</p>
-                                        <p className="text-gray-600">Coins Count: {category.coins_count}</p>
+                                        <p className="my-2 text-xl font-bold">{category.name}</p>
+                                        <p>Coins Count: {category.coins_count}</p>
                                     </div>
                                 </div>
                             </li>

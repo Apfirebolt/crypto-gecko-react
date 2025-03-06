@@ -91,7 +91,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 container mx-auto">
+    <div className="min-h-screen bg-primary-300 container mx-auto">
       {loading ? (
         <Loader />
       ) : (
