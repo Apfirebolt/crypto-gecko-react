@@ -1,11 +1,11 @@
-import { Fragment, FC } from "react";
+import React, { Fragment, FC } from "react";
 
 const FooterComponent: FC = () => {
   return (
     <Fragment>
       <footer
-        className="bg-neutral-700
-             text-xl text-white text-center
+        className="bg-primary-100
+             text-xl text-secondary-100 text-center
              border-t-4
              fixed
              inset-x-0

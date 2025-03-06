@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button.tsx";
 import Loader from "../components/Loader.tsx";
 
 interface Coin {
@@ -90,7 +90,7 @@ const Coins: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-primary-300">
       {loading ? (
         <Loader />
       ) : (
@@ -98,14 +98,14 @@ const Coins: React.FC = () => {
           <h1 className="text-2xl font-bold text-center mb-4">Coins</h1>
           <div className="flex justify-center mb-4">
             <Button
-              className="bg-blue-500 text-white px-4 py-2 hover:bg-blue-700"
+              className="bg-primary-200 text-white px-4 py-2 hover:text-white transition-all duration-300 hover:bg-blue-700"
               onClick={goToPreviousPage}
               disabled={page === 1}
             >
               Previous
             </Button>
             <Button
-              className="bg-blue-500 mx-2 text-white px-4 py-2 hover:bg-blue-700"
+              className="bg-primary-300 mx-2 text-secondary-300 px-4 py-2 hover:text-white transition-all duration-300 hover:bg-blue-700"
               onClick={goToNextPage}
             >
               Next
@@ -115,27 +115,27 @@ const Coins: React.FC = () => {
             <ul>
               {coins.map((coin) => (
                 <li key={coin.id} className="mb-4">
-                  <div className="flex items-center container bg-neutral-100 p-4 rounded-lg shadow-lg">
+                  <div className="flex items-center container bg-secondary-300 text-primary-300 p-4 rounded-lg shadow-lg">
                     <img
                       src={coin.image}
                       alt={coin.name}
                       className="w-24 h-24 mr-4"
                     />
                     <div className="p-3">
-                      <p className="text-blue-500 text-xl">
+                      <p className="my-2 text-xl">
                         {coin.name} ({coin.symbol.toUpperCase()})
                       </p>
                       <div className="my-2">
-                        <p className="text-gray-600 text-md my-2">
+                        <p className="text-md my-2">
                           Price: ${coin.current_price}
                         </p>
-                        <p className="text-gray-600 my-1">
+                        <p className="my-1">
                           Market Cap: ${coin.market_cap}
                         </p>
-                        <p className="text-gray-600 my-1">
+                        <p className="my-1">
                           Volume: ${coin.total_volume}
                         </p>
-                        <p className="text-gray-600 my-1">
+                        <p className="my-1">
                           Price Change (24h): {coin.price_change_percentage_24h}%
                         </p>
                       </div>
