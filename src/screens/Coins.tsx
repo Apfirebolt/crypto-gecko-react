@@ -129,14 +129,11 @@ const Coins: React.FC = () => {
                         <p className="text-md my-2">
                           Price: ${coin.current_price}
                         </p>
+                        <p className="my-1">Market Cap: ${coin.market_cap}</p>
+                        <p className="my-1">Volume: ${coin.total_volume}</p>
                         <p className="my-1">
-                          Market Cap: ${coin.market_cap}
-                        </p>
-                        <p className="my-1">
-                          Volume: ${coin.total_volume}
-                        </p>
-                        <p className="my-1">
-                          Price Change (24h): {coin.price_change_percentage_24h}%
+                          Price Change (24h): {coin.price_change_percentage_24h}
+                          %
                         </p>
                       </div>
                     </div>

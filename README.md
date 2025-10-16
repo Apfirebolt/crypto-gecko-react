@@ -166,6 +166,10 @@ I welcome contributions to this project! If you have suggestions for improvement
 
 4. **Improve Documentation**: If you find any part of the documentation unclear or incomplete, feel free to make improvements.
 
+### Testing in React
+
+pnpm install -D vitest @testing-library/react @testing-library/jest-dom jsdom
+
 ### How to Contribute
 
 1. Fork the repository.
