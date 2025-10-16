@@ -17,4 +17,14 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // =========================================================
+  // VITEST CONFIGURATION (Added for Testing)
+  // =========================================================
+  test: {
+    environment: 'jsdom',
+    
+    globals: true, 
+
+    setupFiles: './src/test/setup.ts', 
+  },
 })
