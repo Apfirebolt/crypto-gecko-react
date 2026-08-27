@@ -1,24 +1,37 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 
-body {
-    font-family: 'Roboto', sans-serif;
-}
+@import "tailwindcss";
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Montserrat', sans-serif;
-}
-
-p {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-    font-family: 'Montserrat', sans-serif;
-}
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 @layer base {
   :root {
-        --radius: 0.5rem;
-    }
+    --radius: 0.5rem;
+  }
+
+  body {
+    font-family: 'Roboto', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6, p {
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  p {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+}
+
+@theme {
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --color-primary-100: #222831;
+  --color-primary-200: #00ADB5;
+  --color-primary-300: #EEEEEE;
+
+  --color-secondary-100: #DBE2EF;
+  --color-secondary-200: #3F72AF;
+  --color-secondary-300: #112D4E;
 }
