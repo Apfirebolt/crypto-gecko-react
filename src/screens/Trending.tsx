@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Loader from "../components/Loader.tsx";
+import Loader from "../components/Loader";
+
+interface CoinItem {
+  id: string;
+  name: string;
+  symbol: string;
+  market_cap_rank: number;
+  score: number;
+  price_btc: number;
+  thumb: string;
+  large?: string;
+}
 
 interface Coin {
-  item: {
-    id: string;
-    name: string;
-    symbol: string;
-    market_cap_rank: number;
-    score: number;
-    price_btc: number;
-    thumb: string;
-  };
+  item: CoinItem;
 }
 
 interface Category {
-  id: string;
+  id: string | number;
   name: string;
   coins_count: number;
 }
@@ -25,86 +28,143 @@ interface TrendingData {
   categories: Category[];
 }
 
-const Trending = () => {
+const Trending: React.FC = () => {
   const [trending, setTrending] = useState<TrendingData>({
     coins: [],
     categories: [],
   });
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchData = async () => {
       try {
-        const headers = {
-          "x-cg-pro-api-key": "",
-        };
         setLoading(true);
-        const response = await axios.get(
+        setError(null);
+
+        const apiKey = import.meta.env.VITE_COINGECKO_API_KEY;
+        const headers: Record<string, string> = apiKey
+          ? { "x-cg-demo-api-key": apiKey }
+          : {};
+
+        const response = await axios.get<TrendingData>(
           "https://api.coingecko.com/api/v3/search/trending",
-          { headers }
+          {
+            headers,
+            signal: controller.signal,
+          }
         );
-        if (response) {
-          setLoading(false);
-          setTrending(response.data);
+
+        setTrending(response.data);
+      } catch (err: unknown) {
+        if (!axios.isCancel(err)) {
+          setError(
+            axios.isAxiosError(err)
+              ? err.response?.data?.error || err.message
+              : "Failed to fetch trending data."
+          );
         }
-      } catch (error) {
+      } finally {
         setLoading(false);
-        console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
+
+    return () => controller.abort();
   }, []);
 
-  return (
-    <div className="min-h-screen bg-primary-300 container mx-auto">
-      {loading ? (
-        <Loader />
-      ) : (
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h1 className="text-2xl font-bold text-center mb-4">
-            Trending Coins
-          </h1>
-          <ul>
-            {trending.coins &&
-              trending.coins.map((coin) => (
-                <li key={coin.item.id} className="mb-4">
-                  <div className="flex items-center container bg-secondary-300 text-primary-300 p-4 rounded-lg shadow-lg">
-                    <img
-                      src={coin.item.thumb}
-                      alt={coin.item.name}
-                      className="w-24 h-24 mr-4"
-                    />
-                    <div className="p-3">
-                      <p className="my-2 text-xl font-bold">{coin.item.name}</p>
-                      <p>Symbol: {coin.item.symbol}</p>
-                      <p>Rank: {coin.item.market_cap_rank}</p>
-                      <p>Score: {coin.item.score}</p>
-                      <p>BTC Price: {coin.item.price_btc}</p>
-                    </div>
-                  </div>
-                </li>
-              ))}
-          </ul>
+  if (loading) return <Loader />;
 
-          <h1 className="text-2xl font-bold text-center mb-4">
-            Trending Categories
-          </h1>
-          <ul>
-            {trending.categories &&
-              trending.categories.map((category) => (
-                <li key={category.id} className="mb-4">
-                  <div className="flex items-center container bg-secondary-300 text-primary-300 p-4 rounded-lg shadow-lg">
-                    <div className="p-3">
-                      <p className="my-2 text-xl font-bold">{category.name}</p>
-                      <p>Coins Count: {category.coins_count}</p>
-                    </div>
-                  </div>
-                </li>
-              ))}
-          </ul>
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="bg-red-50 text-red-700 p-4 rounded-lg border border-red-200">
+          <p className="font-semibold">Error</p>
+          <p className="text-sm">{error}</p>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-neutral-950 py-10 px-4 sm:px-6 lg:px-8 text-neutral-100">
+      <div className="max-w-7xl mx-auto space-y-12">
+        <section>
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              🔥 Trending Coins
+            </h1>
+            <p className="mt-2 text-sm text-neutral-400">
+              Most searched cryptocurrencies in the last 24 hours.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {trending.coins.map(({ item }) => (
+              <div
+                key={item.id}
+                className="flex items-center space-x-4 bg-neutral-900/60 p-4 rounded-xl border border-neutral-800 shadow-sm hover:border-neutral-700 transition"
+              >
+                <img
+                  src={item.thumb}
+                  alt={item.name}
+                  className="w-10 h-10 rounded-full flex-shrink-0 bg-neutral-800 border border-neutral-700"
+                  loading="lazy"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-semibold text-white truncate text-sm">
+                      {item.name}
+                    </p>
+                    <span className="text-[11px] font-mono bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded">
+                      #{item.market_cap_rank ?? "—"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-neutral-500 uppercase mt-0.5">
+                    {item.symbol}
+                  </p>
+                  <p className="text-xs font-mono text-emerald-400 mt-1">
+                    ₿ {item.price_btc ? item.price_btc.toFixed(8) : "—"}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {trending.categories && trending.categories.length > 0 && (
+          <section>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold tracking-tight text-white">
+                📊 Trending Categories
+              </h2>
+              <p className="mt-1 text-sm text-neutral-400">
+                Top crypto sectors gaining traction.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {trending.categories.map((category) => (
+                <div
+                  key={category.id}
+                  className="bg-neutral-900/60 p-5 rounded-xl border border-neutral-800 shadow-sm"
+                >
+                  <p className="font-semibold text-white text-base">
+                    {category.name}
+                  </p>
+                  <p className="text-xs text-neutral-400 mt-2">
+                    Coins tracked:{" "}
+                    <span className="font-mono text-neutral-200 font-medium">
+                      {category.coins_count}
+                    </span>
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 };
