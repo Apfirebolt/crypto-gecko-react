@@ -26,7 +26,7 @@ const HeaderComponent: React.FC = () => {
       <div className="container flex flex-wrap justify-between items-center mx-auto">
         <NavLink
           to="/"
-          className="text-xl font-bold text-gray-900 dark:text-white"
+          className="text-xl font-bold text-gray-200 dark:text-neutral-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
           onClick={closeMenu}
         >
           Crypto Gecko
