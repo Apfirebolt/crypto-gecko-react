@@ -173,8 +173,6 @@ describe('FooterComponent', () => {
   it('should have text content that mentions both coins and exchanges in exchanges section', () => {
     render(<FooterComponent />);
     
-    // Note: The actual component has "All the coins in the world All the exchanges in the world"
-    // which appears to be a typo/concatenation issue
     const exchangesSection = screen.getByText(/All the coins in the world All the exchanges in the world/i);
     expect(exchangesSection).toBeInTheDocument();
   });
