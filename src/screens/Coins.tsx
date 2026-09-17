@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import Loader from "../components/Loader";
@@ -16,53 +17,45 @@ interface Coin {
 }
 
 const Coins: React.FC = () => {
-  const [coins, setCoins] = useState<Coin[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const fetchCoins = useCallback(async (targetPage: number) => {
-    try {
-      setLoading(true);
-      setError(null);
+  // React Query fetch function
+  const fetchCoins = async (targetPage: number): Promise<Coin[]> => {
+    const apiKey = import.meta.env.VITE_COINGECKO_API_KEY;
+    const headers: Record<string, string> = apiKey
+      ? { "x-cg-demo-api-key": apiKey }
+      : {};
 
-      const apiKey = import.meta.env.VITE_COINGECKO_API_KEY;
-      const headers: Record<string, string> = apiKey
-        ? { "x-cg-demo-api-key": apiKey }
-        : {};
+    const response = await axios.get<Coin[]>(
+      "https://api.coingecko.com/api/v3/coins/markets",
+      {
+        headers,
+        params: {
+          vs_currency: "usd",
+          order: "market_cap_desc",
+          per_page: 50,
+          page: targetPage,
+          sparkline: false,
+          price_change_percentage: "24h",
+        },
+      }
+    );
+    return response.data;
+  };
 
-      const response = await axios.get<Coin[]>(
-        "https://api.coingecko.com/api/v3/coins/markets",
-        {
-          headers,
-          params: {
-            vs_currency: "usd",
-            order: "market_cap_desc",
-            per_page: 50,
-            page: targetPage,
-            sparkline: false,
-            price_change_percentage: "24h",
-          },
-        }
-      );
-
-      setCoins(response.data);
-      setPage(targetPage);
-    } catch (err: unknown) {
-      setError(
-        axios.isAxiosError(err)
-          ? err.response?.data?.error || err.message
-          : "Failed to fetch market data."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchCoins(page);
-  }, [fetchCoins, page]);
+  const {
+    data: coins = [],
+    isLoading,
+    isError,
+    error,
+    isFetching,
+  } = useQuery({
+    queryKey: ["coins", page],
+    queryFn: () => fetchCoins(page),
+    staleTime: 1000 * 60 * 2, // Cache data for 2 minutes
+    placeholderData: (previousData) => previousData, // Keeps previous page visible while fetching next page smoothly
+  });
 
   const filteredCoins = useMemo(() => {
     return coins.filter(
@@ -98,13 +91,13 @@ const Coins: React.FC = () => {
           </div>
         </div>
 
-        {loading ? (
+        {isLoading ? (
           <div className="flex h-96 items-center justify-center">
             <Loader message="Loading market prices..." fullScreen={false} />
           </div>
-        ) : error ? (
+        ) : isError ? (
           <div className="rounded-xl border border-rose-900/50 bg-rose-950/20 p-6 text-center text-rose-400">
-            {error}
+            {error instanceof Error ? error.message : "Failed to fetch market data."}
           </div>
         ) : (
           <>
@@ -205,16 +198,19 @@ const Coins: React.FC = () => {
             </div>
 
             <div className="mt-6 flex items-center justify-between">
-              <span className="text-xs text-neutral-500">
-                Page <strong className="text-neutral-300">{page}</strong>
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-neutral-500">
+                  Page <strong className="text-neutral-300">{page}</strong>
+                </span>
+                {isFetching && <span className="text-xs text-emerald-400 animate-pulse">Updating...</span>}
+              </div>
 
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => fetchCoins(page - 1)}
-                  disabled={page <= 1 || loading}
+                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={page <= 1 || isFetching}
                   className="border-neutral-800 bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white disabled:opacity-40"
                 >
                   Previous
@@ -222,8 +218,8 @@ const Coins: React.FC = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => fetchCoins(page + 1)}
-                  disabled={loading}
+                  onClick={() => setPage((prev) => prev + 1)}
+                  disabled={isFetching}
                   className="border-neutral-800 bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white disabled:opacity-40"
                 >
                   Next

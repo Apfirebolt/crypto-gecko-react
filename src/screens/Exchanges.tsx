@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Loader from "../components/Loader";
 
@@ -18,37 +19,32 @@ interface Exchange {
 }
 
 const Exchanges: React.FC = () => {
-  const [exchanges, setExchanges] = useState<Exchange[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortBy, setSortBy] = useState<"rank" | "volume" | "trust">("rank");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await axios.get<Exchange[]>(
-          "https://api.coingecko.com/api/v3/exchanges"
-        );
-        setExchanges(response.data);
-      } catch (err) {
-        setError("Failed to load exchange data. Please try again later.");
-        console.error("Error fetching exchanges:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  // React Query implementation (v5 standard object syntax)
+  const {
+    data: exchanges = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["exchanges"],
+    queryFn: async () => {
+      const response = await axios.get<Exchange[]>(
+        "https://api.coingecko.com/api/v3/exchanges"
+      );
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 5, // Cache data for 5 minutes
+  });
 
   const filteredAndSortedExchanges = useMemo(() => {
     return exchanges
-      .filter((ex) =>
-        ex.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (ex.country && ex.country.toLowerCase().includes(searchTerm.toLowerCase()))
+      .filter(
+        (ex) =>
+          ex.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (ex.country && ex.country.toLowerCase().includes(searchTerm.toLowerCase()))
       )
       .sort((a, b) => {
         if (sortBy === "volume") return b.trade_volume_24h_btc - a.trade_volume_24h_btc;
@@ -106,13 +102,13 @@ const Exchanges: React.FC = () => {
         </div>
 
         {/* Content Section */}
-        {loading ? (
+        {isLoading ? (
           <div className="flex h-96 items-center justify-center">
             <Loader message="Loading exchange listings..." />
           </div>
-        ) : error ? (
+        ) : isError ? (
           <div className="rounded-xl border border-rose-900/50 bg-rose-950/20 p-6 text-center text-rose-400">
-            {error}
+            {error instanceof Error ? error.message : "Failed to load exchange data. Please try again later."}
           </div>
         ) : (
           <div className="overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/50 shadow-2xl backdrop-blur-sm">
