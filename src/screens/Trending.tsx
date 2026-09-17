@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Loader from "../components/Loader";
 
@@ -29,61 +30,41 @@ interface TrendingData {
 }
 
 const Trending: React.FC = () => {
-  const [trending, setTrending] = useState<TrendingData>({
-    coins: [],
-    categories: [],
-  });
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: trending = { coins: [], categories: [] },
+    isLoading,
+    isError,
+    error,
+  } = useQuery<TrendingData>({
+    queryKey: ["trending-coins"],
+    queryFn: async ({ signal }) => {
+      const apiKey = import.meta.env.VITE_COINGECKO_API_KEY;
+      const headers: Record<string, string> = apiKey
+        ? { "x-cg-demo-api-key": apiKey }
+        : {};
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const apiKey = import.meta.env.VITE_COINGECKO_API_KEY;
-        const headers: Record<string, string> = apiKey
-          ? { "x-cg-demo-api-key": apiKey }
-          : {};
-
-        const response = await axios.get<TrendingData>(
-          "https://api.coingecko.com/api/v3/search/trending",
-          {
-            headers,
-            signal: controller.signal,
-          }
-        );
-
-        setTrending(response.data);
-      } catch (err: unknown) {
-        if (!axios.isCancel(err)) {
-          setError(
-            axios.isAxiosError(err)
-              ? err.response?.data?.error || err.message
-              : "Failed to fetch trending data."
-          );
+      const response = await axios.get<TrendingData>(
+        "https://api.coingecko.com/api/v3/search/trending",
+        {
+          headers,
+          signal,
         }
-      } finally {
-        setLoading(false);
-      }
-    };
+      );
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 5, // Cache trending data
+  });
 
-    fetchData();
+  if (isLoading) return <Loader />;
 
-    return () => controller.abort();
-  }, []);
-
-  if (loading) return <Loader />;
-
-  if (error) {
+  if (isError) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="bg-red-50 text-red-700 p-4 rounded-lg border border-red-200">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-neutral-950 text-neutral-100">
+        <div className="bg-rose-950/20 text-rose-400 p-4 rounded-xl border border-rose-900/55">
           <p className="font-semibold">Error</p>
-          <p className="text-sm">{error}</p>
+          <p className="text-sm">
+            {error instanceof Error ? error.message : "Failed to fetch trending data."}
+          </p>
         </div>
       </div>
     );

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, ChangeEvent, Fragment } from "react";
+import React, { useState, Fragment } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Dialog, Transition } from "@headlessui/react";
 import axios from "axios";
 import Loader from "../components/Loader";
@@ -25,78 +26,74 @@ interface PriceState {
 }
 
 const Home: React.FC = () => {
-  const [coinData, setCoinData] = useState<CoinData>({ coins: [] });
   const [searchText, setSearchText] = useState<string>("Bitcoin");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [priceLoadingId, setPriceLoadingId] = useState<string | null>(null);
+  const [debouncedQuery, setDebouncedQuery] = useState<string>("Bitcoin");
+  const [activePriceQuery, setActivePriceQuery] = useState<{ coinId: string; currency: "usd" | "inr" } | null>(null);
   const [priceDetails, setPriceDetails] = useState<PriceState | null>(null);
   const [showPriceModal, setShowPriceModal] = useState<boolean>(false);
 
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
-
-  const fetchCoins = async (query: string) => {
-    if (!query.trim()) {
-      setCoinData({ coins: [] });
-      return;
-    }
-    try {
-      setLoading(true);
+  // Search query managed by React Query
+  const {
+    data: coinData = { coins: [] },
+    isLoading,
+  } = useQuery<CoinData>({
+    queryKey: ["coin-search", debouncedQuery],
+    queryFn: async () => {
+      if (!debouncedQuery.trim()) return { coins: [] };
       const { data } = await axios.get<CoinData>(
-        `https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(query)}`
+        `https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(debouncedQuery)}`
       );
-      setCoinData(data);
-    } catch (error) {
-      console.error("Error searching coins:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return data;
+    },
+    enabled: debouncedQuery.trim().length >= 2,
+    staleTime: 1000 * 60 * 5, // Cache search results for 5 minutes
+  });
 
-  useEffect(() => {
-    fetchCoins("Bitcoin");
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, []);
+  // Spot price query triggered on demand per button click
+  const { isFetching: isPriceFetching } = useQuery({
+    queryKey: ["coin-price", activePriceQuery?.coinId, activePriceQuery?.currency],
+    queryFn: async () => {
+      if (!activePriceQuery) return null;
+      const { coinId, currency } = activePriceQuery;
+      
+      const { data } = await axios.get<{ [key: string]: { [curr: string]: number } }>(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=${currency}`
+      );
 
-  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
+      const price = data[coinId]?.[currency];
+      if (typeof price === "number") {
+        // Find current coin reference for metadata
+        const matchedCoin = coinData.coins.find((c) => c.id === coinId);
+        if (matchedCoin) {
+          setPriceDetails({
+            coinName: matchedCoin.name,
+            symbol: matchedCoin.symbol.toUpperCase(),
+            thumb: matchedCoin.thumb,
+            currency,
+            amount: price,
+          });
+          setShowPriceModal(true);
+        }
+      }
+      // Reset trigger state after completion
+      setActivePriceQuery(null);
+      return data;
+    },
+    enabled: !!activePriceQuery,
+  });
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchText(value);
 
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-
-    debounceRef.current = setTimeout(() => {
-      if (value.trim().length >= 2) {
-        fetchCoins(value);
+    // Simple inline debounce implementation matching your original delay
+    const handler = setTimeout(() => {
+      if (value.trim().length >= 2 || value.trim() === "") {
+        setDebouncedQuery(value);
       }
     }, 400);
-  };
 
-  const fetchPrice = async (coin: Coin, currency: "usd" | "inr") => {
-    try {
-      setPriceLoadingId(`${coin.id}-${currency}`);
-      const { data } = await axios.get<{ [key: string]: { [curr: string]: number } }>(
-        `https://api.coingecko.com/api/v3/simple/price?ids=${coin.id}&vs_currencies=${currency}`
-      );
-
-      const price = data[coin.id]?.[currency];
-      if (typeof price === "number") {
-        setPriceDetails({
-          coinName: coin.name,
-          symbol: coin.symbol.toUpperCase(),
-          thumb: coin.thumb,
-          currency,
-          amount: price,
-        });
-        setShowPriceModal(true);
-      }
-    } catch (error) {
-      console.error("Error fetching price:", error);
-    } finally {
-      setPriceLoadingId(null);
-    }
+    return () => clearTimeout(handler);
   };
 
   const closeModal = () => {
@@ -131,59 +128,64 @@ const Home: React.FC = () => {
           </div>
         </div>
 
-        {loading ? (
+        {isLoading ? (
           <div className="flex h-72 items-center justify-center">
             <Loader message="Searching market assets..." fullScreen={false} />
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {coinData.coins && coinData.coins.length > 0 ? (
-              coinData.coins.map((coin) => (
-                <div
-                  key={coin.id}
-                  className="flex flex-col justify-between rounded-xl border border-neutral-800/80 bg-neutral-900/50 p-5 shadow-sm transition hover:border-neutral-700 hover:bg-neutral-900/80"
-                >
-                  <div className="flex items-center gap-3.5">
-                    <img
-                      src={coin.thumb}
-                      alt={coin.name}
-                      className="h-11 w-11 rounded-full bg-neutral-800 p-0.5 border border-neutral-700"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-white truncate text-sm">
-                          {coin.name}
-                        </span>
-                        <span className="text-[11px] font-mono uppercase bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded">
-                          {coin.symbol}
-                        </span>
+              coinData.coins.map((coin) => {
+                const isUsdLoading = isPriceFetching && activePriceQuery?.coinId === coin.id && activePriceQuery?.currency === "usd";
+                const isInrLoading = isPriceFetching && activePriceQuery?.coinId === coin.id && activePriceQuery?.currency === "inr";
+
+                return (
+                  <div
+                    key={coin.id}
+                    className="flex flex-col justify-between rounded-xl border border-neutral-800/80 bg-neutral-900/50 p-5 shadow-sm transition hover:border-neutral-700 hover:bg-neutral-900/80"
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <img
+                        src={coin.thumb}
+                        alt={coin.name}
+                        className="h-11 w-11 rounded-full bg-neutral-800 p-0.5 border border-neutral-700"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-white truncate text-sm">
+                            {coin.name}
+                          </span>
+                          <span className="text-[11px] font-mono uppercase bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded">
+                            {coin.symbol}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-xs text-neutral-500 font-mono">
+                          Rank #{coin.market_cap_rank ?? "N/A"}
+                        </p>
                       </div>
-                      <p className="mt-1 text-xs text-neutral-500 font-mono">
-                        Rank #{coin.market_cap_rank ?? "N/A"}
-                      </p>
+                    </div>
+
+                    <div className="mt-5 grid grid-cols-2 gap-2 border-t border-neutral-800/60 pt-4">
+                      <button
+                        type="button"
+                        disabled={isPriceFetching}
+                        onClick={() => setActivePriceQuery({ coinId: coin.id, currency: "usd" })}
+                        className="inline-flex items-center justify-center rounded-lg border border-neutral-700 bg-neutral-800/60 px-3 py-2 text-xs font-medium text-emerald-400 transition hover:bg-neutral-800 hover:border-emerald-500/50 disabled:opacity-50"
+                      >
+                        {isUsdLoading ? "Fetching..." : "Spot (USD)"}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={isPriceFetching}
+                        onClick={() => setActivePriceQuery({ coinId: coin.id, currency: "inr" })}
+                        className="inline-flex items-center justify-center rounded-lg border border-neutral-700 bg-neutral-800/60 px-3 py-2 text-xs font-medium text-blue-400 transition hover:bg-neutral-800 hover:border-blue-500/50 disabled:opacity-50"
+                      >
+                        {isInrLoading ? "Fetching..." : "Spot (INR)"}
+                      </button>
                     </div>
                   </div>
-
-                  <div className="mt-5 grid grid-cols-2 gap-2 border-t border-neutral-800/60 pt-4">
-                    <button
-                      type="button"
-                      disabled={priceLoadingId === `${coin.id}-usd`}
-                      onClick={() => fetchPrice(coin, "usd")}
-                      className="inline-flex items-center justify-center rounded-lg border border-neutral-700 bg-neutral-800/60 px-3 py-2 text-xs font-medium text-emerald-400 transition hover:bg-neutral-800 hover:border-emerald-500/50 disabled:opacity-50"
-                    >
-                      {priceLoadingId === `${coin.id}-usd` ? "Fetching..." : "Spot (USD)"}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={priceLoadingId === `${coin.id}-inr`}
-                      onClick={() => fetchPrice(coin, "inr")}
-                      className="inline-flex items-center justify-center rounded-lg border border-neutral-700 bg-neutral-800/60 px-3 py-2 text-xs font-medium text-blue-400 transition hover:bg-neutral-800 hover:border-blue-500/50 disabled:opacity-50"
-                    >
-                      {priceLoadingId === `${coin.id}-inr` ? "Fetching..." : "Spot (INR)"}
-                    </button>
-                  </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="col-span-full py-16 text-center text-sm text-neutral-500">
                 No cryptocurrencies found matching &ldquo;{searchText}&rdquo;.
